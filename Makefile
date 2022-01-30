@@ -56,7 +56,7 @@ clean:
 
 external/libjxl/build/lib/include/jxl/jxl_export.h: external/libjxl/build/lib/libjxl-static.a
 
-external/libjxl/build/lib/libjxl_threads-static.a: external/libjxl/build/lib/libjxl-static.a
+external/libjxl/build/lib/libjxl_threads-static.a external/libjxl/build/third_party/highway/libhwy.a external/libjxl/build/third_party/brotli/libbrotlicommon-static.a external/libjxl/build/third_party/brotli/libbrotlidec-static.a: external/libjxl/build/lib/libjxl-static.a
 
 extractor.o: external/libjxl/build/lib/include/jxl/jxl_export.h
 
