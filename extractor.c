@@ -189,6 +189,7 @@ int getBMPFromJXL(const uint8_t *input_data, size_t file_size,
 		}
 	}
 
+	// Fill in the bitmap information and file header.
 	memset(bitmap_file_header, 0, sizeof(BITMAPFILEHEADER));
 	memset(bitmap_info_header, 0, sizeof(BITMAPINFOHEADER));
 
