@@ -1,6 +1,6 @@
 # JPEG XL Susie plugin
 
-This plugin allows accelerated reading of JPEG XL images in Susie plugin-compatible image viewers.
+This plugin allows reading of JPEG XL images in Susie plugin-compatible image viewers.
 
 ## Downloads
 
@@ -13,7 +13,7 @@ After cloning submodules, a simple `make` will generate `ifjxl.spi`.
 
 ## How to use
 
-Susie plugins are compatile with many programs, including these:
+Susie plugins are compatible with many programs, including these:
 
 - [A to B converter](http://www.asahi-net.or.jp/~KH4S-SMZ/spi/abc/index.html)
 - [Linar](http://hp.vector.co.jp/authors/VA015839/)
