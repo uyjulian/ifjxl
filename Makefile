@@ -61,7 +61,34 @@ external/libjxl/build/lib/libjxl_threads-static.a external/libjxl/build/third_pa
 extractor.o: external/libjxl/build/lib/include/jxl/jxl_export.h
 
 external/libjxl/build/lib/libjxl-static.a:
-	mkdir -p external/libjxl/build && cd external/libjxl/build && cmake -GNinja -DCMAKE_TOOLCHAIN_FILE=../../../mingw32.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-DHWY_DISABLED_TARGETS=\"HWY_AVX2|HWY_AVX3\"" -DJPEGXL_ENABLE_JNI=OFF -DJPEGXL_ENABLE_MANPAGES=OFF -DJPEGXL_BUNDLE_GFLAGS=ON -DBUILD_TESTING=OFF -DJPEGXL_ENABLE_TOOLS=OFF -DJPEGXL_ENABLE_VIEWERS=OFF .. && ninja
+	mkdir -p external/libjxl/build && \
+	cd external/libjxl/build && \
+	cmake \
+		-GNinja \
+		-DCMAKE_SYSTEM_NAME=Windows \
+		-DCMAKE_SYSTEM_PROCESSOR=i686 \
+		-DCMAKE_FIND_ROOT_PATH=/dev/null \
+		-DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
+		-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+		-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+		-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY \
+		-DCMAKE_DISABLE_FIND_PACKAGE_PkgConfig=TRUE \
+		-DCMAKE_C_COMPILER=$(CC) \
+		-DCMAKE_CXX_COMPILER=$(CXX) \
+		-DCMAKE_RC_COMPILER=$(WINDRES) \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DJPEGXL_ENABLE_OPENEXR=FALSE \
+		-DJPEGXL_ENABLE_TOOLS=FALSE \
+		-DJPEGXL_ENABLE_BENCHMARK=FALSE \
+		-DCMAKE_CXX_FLAGS="-DHWY_DISABLED_TARGETS=\"HWY_AVX2|HWY_AVX3\"" \
+		-DJPEGXL_ENABLE_JNI=OFF \
+		-DJPEGXL_ENABLE_MANPAGES=OFF \
+		-DJPEGXL_BUNDLE_GFLAGS=ON \
+		-DBUILD_TESTING=OFF \
+		-DJPEGXL_ENABLE_TOOLS=OFF \
+		-DJPEGXL_ENABLE_VIEWERS=OFF \
+		.. && \
+	ninja
 
 $(ARCHIVE): $(BINARY_STRIPPED)
 	rm -f $(ARCHIVE)
