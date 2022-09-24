@@ -106,7 +106,7 @@ ARCHIVE ?= $(PROJECT_BASENAME).$(TARGET_ARCH).$(GIT_TAG).7z
 endif
 ARCHIVE ?= $(PROJECT_BASENAME).$(TARGET_ARCH).7z
 
-LIBJXL_LIBS += external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl-static.a external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl_threads-static.a external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/third_party/highway/libhwy.a external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/third_party/brotli/libbrotlicommon-static.a external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/third_party/brotli/libbrotlidec-static.a
+LIBJXL_LIBS += external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl.a external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl_threads.a external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/third_party/highway/libhwy.a external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/third_party/brotli/libbrotlicommon-static.a external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/third_party/brotli/libbrotlidec-static.a
 SOURCES := extractor.c spi00in.c ifjxl.rc
 OBJECTS := $(SOURCES:.c=$(OBJECT_EXTENSION))
 OBJECTS := $(OBJECTS:.cpp=$(OBJECT_EXTENSION))
@@ -124,16 +124,16 @@ clean::
 	rm -f $(OBJECTS) $(OBJECTS_BIN) $(BINARY) $(BINARY_STRIPPED) $(ARCHIVE) $(DEPENDENCIES)
 	rm -rf external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)
 
-external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/include/jxl/jxl_export.h: external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl-static.a
+external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/include/jxl/jxl_export.h: external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl.a
 
-external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl_threads-static.a: external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl-static.a
-external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/third_party/highway/libhwy.a: external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl-static.a
-external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/third_party/brotli/libbrotlicommon-static.a: external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl-static.a
-external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/third_party/brotli/libbrotlidec-static.a: external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl-static.a
+external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl_threads.a: external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl.a
+external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/third_party/highway/libhwy.a: external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl.a
+external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/third_party/brotli/libbrotlicommon-static.a: external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl.a
+external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/third_party/brotli/libbrotlidec-static.a: external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl.a
 
 extractor$(OBJECT_EXTENSION): external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/include/jxl/jxl_export.h
 
-external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl-static.a:
+external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl.a:
 	mkdir -p external/libjxl/$(BUILD_DIR_EXTERNAL_NAME) && \
 	cd external/libjxl/$(BUILD_DIR_EXTERNAL_NAME) && \
 	cmake \
