@@ -134,10 +134,9 @@ external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/third_party/brotli/libbrotlidec-stati
 extractor$(OBJECT_EXTENSION): external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/include/jxl/jxl_export.h
 
 external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl.a:
-	mkdir -p external/libjxl/$(BUILD_DIR_EXTERNAL_NAME) && \
-	cd external/libjxl/$(BUILD_DIR_EXTERNAL_NAME) && \
 	cmake \
-		-GNinja \
+		-B external/libjxl/$(BUILD_DIR_EXTERNAL_NAME) \
+		-S external/libjxl \
 		-DCMAKE_SYSTEM_NAME=Windows \
 		-DCMAKE_SYSTEM_PROCESSOR=$(TARGET_CMAKE_SYSTEM_PROCESSOR) \
 		-DCMAKE_FIND_ROOT_PATH=/dev/null \
@@ -160,8 +159,8 @@ external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)/lib/libjxl.a:
 		-DBUILD_TESTING=OFF \
 		-DJPEGXL_ENABLE_TOOLS=OFF \
 		-DJPEGXL_ENABLE_VIEWERS=OFF \
-		.. && \
-	ninja
+		&& \
+	cmake --build external/libjxl/$(BUILD_DIR_EXTERNAL_NAME)
 
 $(ARCHIVE): $(BINARY_STRIPPED) $(EXTRA_DIST)
 	@printf '\t%s %s\n' 7Z $@
