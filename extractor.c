@@ -164,28 +164,34 @@ int getBMPFromJXL(const uint8_t *input_data, size_t file_size,
 	}
 
 	// Convert from RGBA to BGRA
-	for (int j = 0; j < height; j++)
+	// Flip along the horizontal axis
+	int j;
+	for (j = 0; j < height / 2; j++)
 	{
-		uint8_t *curbit = bitmap_data + (height - (1 + j)) * bit_length;
+		DWORD* cur_1 = (DWORD*)bitmap_data + j * width;
+		DWORD* cur_2 = (DWORD*)bitmap_data + (height - (1 + j)) * width;
 		for (int i = 0; i < width; i++)
 		{
-			uint8_t b = curbit[0];
-			uint8_t r = curbit[2];
-			curbit[2] = b;
-			curbit[0] = r;
-			curbit += 4;
+			DWORD tmp =
+				((cur_1[i] << 16) & 0x00ff0000) |
+				((cur_1[i] >> 16) & 0x000000ff) |
+				((cur_1[i])       & 0xff00ff00);
+			cur_1[i] =
+				((cur_2[i] << 16) & 0x00ff0000) |
+				((cur_2[i] >> 16) & 0x000000ff) |
+				((cur_2[i])       & 0xff00ff00);
+			cur_2[i] = tmp;
 		}
 	}
-	// Flip along the horizontal axis
-	for (int j = 0; j < height / 2; j++)
+	if (height % 2)
 	{
-		uint8_t *curbit_1 = bitmap_data + j * bit_length;
-		uint8_t *curbit_2 = bitmap_data + (height - (1 + j)) * bit_length;
-		for (int i = 0; i < bit_width; i++)
+		DWORD* cur = (DWORD*)bitmap_data + j * width;
+		for (int i = 0; i < width; i++)
 		{
-			uint8_t tmp = curbit_1[i];
-			curbit_1[i] = curbit_2[i];
-			curbit_2[i] = tmp;
+			cur[i] =
+				((cur[i] << 16) & 0x00ff0000) |
+				((cur[i] >> 16) & 0x000000ff) |
+				((cur[i])       & 0xff00ff00);
 		}
 	}
 
