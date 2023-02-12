@@ -33,19 +33,19 @@ const char *plugin_info[4] = {
 
 const int header_size = 12;
 
-int getBMPFromJXL(const uint8_t *input_data, size_t file_size,
-                  BITMAPFILEHEADER *bitmap_file_header,
-                  BITMAPINFOHEADER *bitmap_info_header, uint8_t **data) {
+int getBMPFromJXL(const uint8_t* input_data, size_t file_size,HANDLE* h_bitmap_info, HANDLE* h_bitmap_data) {
 	int width, height;
-	int bit_width;
-	int bit_length;
+	size_t buffer_size;
 	int ret;
+	BITMAPINFOHEADER *bitmap_info_header;
 	uint8_t *bitmap_data;
 	JxlParallelRunner * runner;
 	JxlDecoder * dec;
-	bit_width = 0;
-	bit_length = 0;
+	width = 0;
+	height = 0;
+	buffer_size = 0;
 	ret = 1;
+	bitmap_info_header = NULL;
 	bitmap_data = NULL;
 	dec = NULL;
 
@@ -111,13 +111,10 @@ int getBMPFromJXL(const uint8_t *input_data, size_t file_size,
 			}
 			width = info.xsize;
 			height = info.ysize;
-			bit_width = width * 4;
-			bit_length = bit_width;
 			JxlResizableParallelRunnerSetThreads(runner, JxlResizableParallelRunnerSuggestThreads(info.xsize, info.ysize));
 		}
 		else if (status == JXL_DEC_NEED_IMAGE_OUT_BUFFER)
 		{
-			size_t buffer_size;
 			if (JXL_DEC_SUCCESS != JxlDecoderImageOutBufferSize(dec, &format, &buffer_size))
 			{
 				DBGFPRINTF(stderr, "JxlDecoderImageOutBufferSize failed\n");
@@ -132,9 +129,18 @@ int getBMPFromJXL(const uint8_t *input_data, size_t file_size,
 				ret = 0;
 				goto cleanup;
 			}
-			bitmap_data = malloc(buffer_size);
+			*h_bitmap_data = LocalAlloc(LMEM_MOVEABLE, buffer_size);
+			if (NULL == *h_bitmap_data)
+			{
+				DBGFPRINTF(stderr, "Memory error\n");
+				ret = 0;
+				goto cleanup;
+			}
+			bitmap_data = (uint8_t*)LocalLock(*h_bitmap_data);
 			if (NULL == bitmap_data)
 			{
+				LocalFree(*h_bitmap_data);
+				DBGFPRINTF(stderr, "Memory error\n");
 				ret = 0;
 				goto cleanup;
 			}
@@ -196,33 +202,43 @@ int getBMPFromJXL(const uint8_t *input_data, size_t file_size,
 	}
 
 	// Fill in the bitmap information and file header.
-	memset(bitmap_file_header, 0, sizeof(BITMAPFILEHEADER));
-	memset(bitmap_info_header, 0, sizeof(BITMAPINFOHEADER));
+	*h_bitmap_info = LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPINFOHEADER));
+	if (NULL == *h_bitmap_info)
+	{
+		DBGFPRINTF(stderr, "Memory error\n");
+		ret = 0;
+		goto cleanup;
+	}
+	bitmap_info_header = (BITMAPINFOHEADER*)LocalLock(*h_bitmap_info);
+	if (NULL == bitmap_info_header)
+	{
+		LocalFree(*h_bitmap_info);
+		DBGFPRINTF(stderr, "Memory error\n");
+		ret = 0;
+		goto cleanup;
+	}
 
-	bitmap_file_header->bfType = 'M' * 256 + 'B';
-	bitmap_file_header->bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + sizeof(uint8_t) * bit_length * height;
-	bitmap_file_header->bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-	bitmap_file_header->bfReserved1 = 0;
-	bitmap_file_header->bfReserved2 = 0;
-
-	bitmap_info_header->biSize = 40;
+	bitmap_info_header->biSize = sizeof(BITMAPINFOHEADER);
 	bitmap_info_header->biWidth = width;
 	bitmap_info_header->biHeight = height;
 	bitmap_info_header->biPlanes = 1;
 	bitmap_info_header->biBitCount = 32;
-	bitmap_info_header->biCompression = 0;
-	bitmap_info_header->biSizeImage = bitmap_file_header->bfSize;
-	bitmap_info_header->biXPelsPerMeter = bitmap_info_header->biYPelsPerMeter = 0;
-	bitmap_info_header->biClrUsed = 0;
-	bitmap_info_header->biClrImportant = 0;
+	bitmap_info_header->biCompression = BI_RGB;
+	bitmap_info_header->biSizeImage = buffer_size;
+
+	LocalUnlock(*h_bitmap_data);
+	LocalUnlock(*h_bitmap_info);
+
 cleanup:
 	if (NULL != bitmap_data && 0 == ret)
 	{
-		free(bitmap_data);
+		LocalUnlock(*h_bitmap_data);
+		LocalFree(*h_bitmap_data);
 	}
-	else
+	if (NULL != bitmap_info_header && 0 == ret)
 	{
-		*data = bitmap_data;
+		LocalUnlock(*h_bitmap_info);
+		LocalFree(*h_bitmap_info);
 	}
 	if (NULL != runner)
 	{
@@ -331,55 +347,13 @@ cleanup:
 
 int GetPictureEx(size_t data_size, HANDLE *bitmap_info, HANDLE *bitmap_data,
                  SPI_PROGRESS progress_callback, intptr_t user_data, const char *data) {
-	uint8_t *data_u8;
-	BITMAPINFOHEADER bitmap_info_header;
-	BITMAPFILEHEADER bitmap_file_header;
-	BITMAPINFO *bitmap_info_locked;
-	unsigned char *bitmap_data_locked;
-
-	data_u8 = NULL;
 
 	if (progress_callback != NULL)
 		if (progress_callback(1, 1, user_data))
 			return SPI_ABORT;
 
-	if (!getBMPFromJXL((const uint8_t *)data, data_size, &bitmap_file_header,
-	                   &bitmap_info_header, &data_u8))
+	if (!getBMPFromJXL((const uint8_t*)data, data_size, bitmap_info, bitmap_data))
 		return SPI_MEMORY_ERROR;
-	*bitmap_info = LocalAlloc(LMEM_MOVEABLE, sizeof(BITMAPINFOHEADER));
-	*bitmap_data = LocalAlloc(LMEM_MOVEABLE, bitmap_file_header.bfSize -
-	                                             bitmap_file_header.bfOffBits);
-	if (*bitmap_info == NULL || *bitmap_data == NULL) {
-		if (*bitmap_info != NULL)
-			LocalFree(*bitmap_info);
-		if (*bitmap_data != NULL)
-			LocalFree(*bitmap_data);
-		return SPI_NO_MEMORY;
-	}
-	bitmap_info_locked = (BITMAPINFO *)LocalLock(*bitmap_info);
-	bitmap_data_locked = (unsigned char *)LocalLock(*bitmap_data);
-	if (bitmap_info_locked == NULL || bitmap_data_locked == NULL) {
-		LocalFree(*bitmap_info);
-		LocalFree(*bitmap_data);
-		return SPI_MEMORY_ERROR;
-	}
-	bitmap_info_locked->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bitmap_info_locked->bmiHeader.biWidth = bitmap_info_header.biWidth;
-	bitmap_info_locked->bmiHeader.biHeight = bitmap_info_header.biHeight;
-	bitmap_info_locked->bmiHeader.biPlanes = 1;
-	bitmap_info_locked->bmiHeader.biBitCount = 32;
-	bitmap_info_locked->bmiHeader.biCompression = BI_RGB;
-	bitmap_info_locked->bmiHeader.biSizeImage = 0;
-	bitmap_info_locked->bmiHeader.biXPelsPerMeter = 0;
-	bitmap_info_locked->bmiHeader.biYPelsPerMeter = 0;
-	bitmap_info_locked->bmiHeader.biClrUsed = 0;
-	bitmap_info_locked->bmiHeader.biClrImportant = 0;
-	memcpy(bitmap_data_locked, data_u8,
-	       bitmap_file_header.bfSize - bitmap_file_header.bfOffBits);
-
-	LocalUnlock(*bitmap_info);
-	LocalUnlock(*bitmap_data);
-	free(data_u8);
 
 	if (progress_callback != NULL)
 		if (progress_callback(1, 1, user_data))
