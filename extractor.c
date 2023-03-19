@@ -140,6 +140,7 @@ int getBMPFromJXL(const uint8_t* input_data, size_t file_size,HANDLE* h_bitmap_i
 			if (NULL == bitmap_data)
 			{
 				LocalFree(*h_bitmap_data);
+				*h_bitmap_data = NULL;
 				DBGFPRINTF(stderr, "Memory error\n");
 				ret = 0;
 				goto cleanup;
@@ -213,6 +214,7 @@ int getBMPFromJXL(const uint8_t* input_data, size_t file_size,HANDLE* h_bitmap_i
 	if (NULL == bitmap_info_header)
 	{
 		LocalFree(*h_bitmap_info);
+		*h_bitmap_info = NULL;
 		DBGFPRINTF(stderr, "Memory error\n");
 		ret = 0;
 		goto cleanup;
@@ -234,11 +236,13 @@ cleanup:
 	{
 		LocalUnlock(*h_bitmap_data);
 		LocalFree(*h_bitmap_data);
+		*h_bitmap_data = NULL;
 	}
 	if (NULL != bitmap_info_header && 0 == ret)
 	{
 		LocalUnlock(*h_bitmap_info);
 		LocalFree(*h_bitmap_info);
+		*h_bitmap_info = NULL;
 	}
 	if (NULL != runner)
 	{
