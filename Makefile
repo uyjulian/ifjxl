@@ -161,7 +161,7 @@ DEPENDENCY_SOURCE_DIRECTORY_LIBJXL := $(DEPENDENCY_SOURCE_DIRECTORY)/libjxl
 DEPENDENCY_SOURCE_URL_LIBJXL := https://github.com/libjxl/libjxl.git
 
 $(DEPENDENCY_SOURCE_DIRECTORY_LIBJXL): | $(DEPENDENCY_SOURCE_DIRECTORY)
-	git clone --depth 1 --branch v0.8.1 --recursive --shallow-submodules $(DEPENDENCY_SOURCE_URL_LIBJXL) $@
+	git clone --depth 1 --branch v0.8.2 --recursive --shallow-submodules $(DEPENDENCY_SOURCE_URL_LIBJXL) $@
 
 $(DEPENDENCY_OUTPUT_DIRECTORY)/lib/libjxl_threads.a: $(DEPENDENCY_OUTPUT_DIRECTORY)/lib/libjxl.a
 $(DEPENDENCY_OUTPUT_DIRECTORY)/lib/libhwy.a: $(DEPENDENCY_OUTPUT_DIRECTORY)/lib/libjxl.a
