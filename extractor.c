@@ -203,7 +203,7 @@ int getBMPFromJXL(const uint8_t* input_data, size_t file_size,HANDLE* h_bitmap_i
 	}
 
 	// Fill in the bitmap information and file header.
-	*h_bitmap_info = LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPINFOHEADER));
+	*h_bitmap_info = LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPINFO));
 	if (NULL == *h_bitmap_info)
 	{
 		DBGFPRINTF(stderr, "Memory error\n");
