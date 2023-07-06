@@ -175,19 +175,19 @@ int getBMPFromJXL(const uint8_t* input_data, size_t file_size,HANDLE* h_bitmap_i
 	int j;
 	for (j = 0; j < height / 2; j++)
 	{
-		DWORD* cur_1 = (DWORD*)bitmap_data + j * width;
-		DWORD* cur_2 = (DWORD*)bitmap_data + (height - (1 + j)) * width;
+		DWORD* curbit_1 = (DWORD*)bitmap_data + j * width;
+		DWORD* curbit_2 = (DWORD*)bitmap_data + (height - (1 + j)) * width;
 		for (int i = 0; i < width; i++)
 		{
 			DWORD tmp =
-				((cur_1[i] << 16) & 0x00ff0000) |
-				((cur_1[i] >> 16) & 0x000000ff) |
-				((cur_1[i])       & 0xff00ff00);
-			cur_1[i] =
-				((cur_2[i] << 16) & 0x00ff0000) |
-				((cur_2[i] >> 16) & 0x000000ff) |
-				((cur_2[i])       & 0xff00ff00);
-			cur_2[i] = tmp;
+				((curbit_1[i] << 16) & 0x00ff0000) |
+				((curbit_1[i] >> 16) & 0x000000ff) |
+				((curbit_1[i])       & 0xff00ff00);
+			curbit_1[i] =
+				((curbit_2[i] << 16) & 0x00ff0000) |
+				((curbit_2[i] >> 16) & 0x000000ff) |
+				((curbit_2[i])       & 0xff00ff00);
+			curbit_2[i] = tmp;
 		}
 	}
 	if (height % 2)
@@ -203,7 +203,7 @@ int getBMPFromJXL(const uint8_t* input_data, size_t file_size,HANDLE* h_bitmap_i
 	}
 
 	// Fill in the bitmap information and file header.
-	*h_bitmap_info = LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPINFOHEADER));
+	*h_bitmap_info = LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, sizeof(BITMAPINFO));
 	if (NULL == *h_bitmap_info)
 	{
 		DBGFPRINTF(stderr, "Memory error\n");
