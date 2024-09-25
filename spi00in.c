@@ -54,7 +54,7 @@ EXPORT(int) IsSupported(LPCSTR filename, DWORD_PTR variant)
 
 	ret = 0;
 	buffer = NULL;
-	if ((variant & (DWORD_PTR)-1 - 0xFFFF) == 0)
+	if ((variant & (~(DWORD_PTR)0xFFFF)) == 0)
 	{
 		buffer = malloc(header_size);
 		if (buffer == NULL)
