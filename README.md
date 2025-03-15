@@ -12,9 +12,18 @@ The following binaries are available:
 * [Win32 (ARM 32-bit Clang)](https://github.com/uyjulian/ifjxl/releases/latest/download/ifjxl.arm32.clang.7z)  
 * [Win32 (ARM 64-bit Clang)](https://github.com/uyjulian/ifjxl/releases/latest/download/ifjxl.arm64.clang.7z)  
 
+## Preparing the environment
+
+Install the `act` tool: https://nektosact.com/installation/index.html
+
 ## Building
 
-After cloning submodules and preparing the environment, a simple invocation of `make` will generate `ifjxl.spi`.  
+```
+$ git clone https://github.com/uyjulian/ifjxl.git
+$ cd ifjxl
+$ act run --artifact-server-path $PWD/build-artifacts
+```
+Output artifacts will be in `build-artifacts` folder.
 
 ## How to use
 
