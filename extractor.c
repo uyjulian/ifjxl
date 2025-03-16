@@ -1,11 +1,5 @@
-/////////////////////////////////////////////
-//                                         //
-//    Copyright (C) 2022-2022 Julian Uy    //
-//  https://sites.google.com/site/awertyb  //
-//                                         //
-//   See details of license at "LICENSE"   //
-//                                         //
-/////////////////////////////////////////////
+/* SPDX-License-Identifier: MIT */
+/* Copyright (c) ifjxl developers */
 
 #include "extractor.h"
 #include <stdint.h>
