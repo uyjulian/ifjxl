@@ -30,7 +30,7 @@ endif()
 include(ExternalProject)
 ExternalProject_Add(libjxl-build
 	GIT_REPOSITORY https://github.com/libjxl/libjxl.git
-	GIT_TAG v0.11.1
+	GIT_TAG v0.12.0
 	GIT_SHALLOW TRUE
 	DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 	CONFIGURE_COMMAND
