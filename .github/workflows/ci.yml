@@ -30,7 +30,7 @@
     "build-win32" : {
       "runs-on" : "ubuntu-latest",
       "container" : {
-        "image" : "ghcr.io/homebrew/ubuntu20.04:latest",
+        "image" : "ghcr.io/homebrew/brew:latest",
         "options" : "--user 0"
       },
       "strategy" : {
@@ -86,7 +86,7 @@
       "steps" : [
         {
           "name" : "Checkout repository",
-          "uses" : "actions/checkout@v3",
+          "uses" : "actions/checkout@v4",
           "with" : {
             "submodules" : "recursive"
           }
